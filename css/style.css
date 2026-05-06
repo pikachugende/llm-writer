@@ -309,8 +309,8 @@ html, body {
   overflow: hidden;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
-
 .editor-container {
   position: relative;
   width: 100%;

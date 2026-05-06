@@ -117,7 +117,18 @@ export class LLMEngine {
       repetition_penalty: 1.1,
     });
 
-    const text = response.choices?.[0]?.message?.content || "";
+    const choice = response?.choices?.[0];
+    const text =
+      choice?.message?.content ??
+      choice?.text ??
+      "";
+
+    if (!text) {
+      console.debug("LLM generate returned empty", {
+        response,
+      });
+    }
+
     return text.trim();
   }
 

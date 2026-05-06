@@ -26,6 +26,7 @@ export class ContextManager {
         this._summarizedUpTo = parsed.summarizedUpTo || 0;
       }
     } catch (_) {}
+
   }
 
   /**
@@ -33,9 +34,9 @@ export class ContextManager {
    */
   getSystemPrompt(type) {
     if (type === "word") {
-      return `You are a text completion assistant. The user is writing a document and has partially typed a word. Complete ONLY the remaining characters of that word. Output NOTHING else — no explanations, no punctuation beyond what's needed, no extra words. Just the missing letters of the current word.`;
+      return "Return JSON only: {\"completion\":\"<full word>\"}.";
     }
-    return `You are a text completion assistant. The user is writing a document and wants you to continue the text naturally. Output ONLY the continuation — a few words to one short sentence. Do NOT repeat any of the existing text. Do NOT add quotes or formatting. Write naturally and concisely.`;
+    return "Return JSON only: {\"completion\":\"<continuation>\"}.";
   }
 
   /**
@@ -75,13 +76,13 @@ export class ContextManager {
       const contextBefore = textBeforeCursor.slice(
         -(Math.min(500, textBeforeCursor.length))
       );
-      return `${prefix}Here is the recent text:\n"""${contextBefore}"""\n\nThe user is typing the word "${partialWord}". Complete ONLY the remaining characters. Output just the missing letters:`;
+      return `${prefix}Here is the recent text:\n"""${contextBefore}"""\n\nThe user started a word that begins with "${partialWord}". Output the full word as JSON:`;
     }
 
     // Multi-word completion
     // Determine appropriate continuation length based on context
     const lastSentences = this._getLastSentences(recentText, 3);
-    return `${prefix}Here is the recent text:\n"""${lastSentences}"""\n\nContinue this text naturally:`;
+    return `${prefix}Continue this text:\n"""${lastSentences}"""\n\nContinue:`;
   }
 
   /**

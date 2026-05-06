@@ -10,8 +10,8 @@ export const CONFIG = {
   // ── Model Configuration ──────────────────────────────────
   // Both word and multi-word completion use the same model by default.
   // You can set them to different model IDs if desired.
-  wordCompletionModel: "gemma-4-E2B-it-q4f16_1-MLC",
-  multiWordCompletionModel: "gemma-4-E2B-it-q4f16_1-MLC",
+  wordCompletionModel: "Llama-3.2-3B-Instruct-q4f16_1-MLC",
+  multiWordCompletionModel: "Llama-3.2-3B-Instruct-q4f16_1-MLC",
 
   // ── Completion Settings ──────────────────────────────────
   // Number of alternative suggestions to generate

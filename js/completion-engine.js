@@ -139,7 +139,9 @@ export class CompletionEngine {
       type === "word" ? CONFIG.wordMaxTokens : CONFIG.multiWordMaxTokens;
 
     // Stop sequences
-    const stop = type === "word" ? [" ", "\n", ".", ",", "!", "?", ";", ":"] : ["\n\n"];
+    const stop = type === "word"
+      ? [" ", "\n", ".", ",", "!", "?", ";", ":"]
+      : undefined;
 
     try {
       const variants = await this.llm.generateVariants(
@@ -232,7 +234,10 @@ export class CompletionEngine {
   _cleanSuggestion(raw, fullText, type) {
     if (!raw) return "";
 
-    let cleaned = raw
+    const extracted = this._extractCompletion(raw);
+    if (!extracted) return "";
+
+    let cleaned = extracted
       .replace(/^["'`]+|["'`]+$/g, "") // Remove surrounding quotes
       .replace(/\n+/g, " ")            // Collapse newlines to spaces
       .trim();
@@ -242,11 +247,9 @@ export class CompletionEngine {
       // Remove any leading/trailing whitespace or punctuation artifacts
       cleaned = cleaned.split(/\s/)[0] || ""; // Take just the first "word"
 
-      // If the model repeated the partial word, strip it
       const partialWord = this._getPartialWord(fullText);
-      if (cleaned.toLowerCase().startsWith(partialWord.toLowerCase())) {
-        const stripped = cleaned.slice(partialWord.length);
-        cleaned = stripped.length > 0 ? stripped : cleaned;
+      if (partialWord && cleaned.toLowerCase().startsWith(partialWord.toLowerCase())) {
+        cleaned = cleaned.slice(partialWord.length);
       }
     } else {
       // Multi-word: ensure it doesn't repeat the ending of the text
@@ -258,6 +261,35 @@ export class CompletionEngine {
     }
 
     return cleaned;
+  }
+
+  _extractCompletion(raw) {
+    const trimmed = (raw || "").trim();
+    if (!trimmed) return "";
+
+    const direct = this._tryParseCompletion(trimmed);
+    if (direct) return direct;
+
+    const start = trimmed.indexOf("{");
+    const end = trimmed.lastIndexOf("}");
+    if (start !== -1 && end > start) {
+      const slice = trimmed.slice(start, end + 1);
+      const sliced = this._tryParseCompletion(slice);
+      if (sliced) return sliced;
+    }
+
+    return trimmed;
+  }
+
+  _tryParseCompletion(jsonText) {
+    if (!jsonText.startsWith("{") || !jsonText.endsWith("}")) return "";
+    try {
+      const parsed = JSON.parse(jsonText);
+      if (typeof parsed?.completion === "string") return parsed.completion;
+      if (typeof parsed?.text === "string") return parsed.text;
+      if (typeof parsed?.output === "string") return parsed.output;
+    } catch (_) {}
+    return "";
   }
 
   _getPartialWord(text) {
