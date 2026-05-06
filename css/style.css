@@ -1,0 +1,484 @@
+/* ========================================================
+   LLM Writer — Global Styles
+   ======================================================== */
+
+:root {
+  /* Color palette */
+  --bg-primary: #0f0f14;
+  --bg-secondary: #16161e;
+  --bg-tertiary: #1e1e2a;
+  --bg-surface: #24243a;
+
+  --text-primary: #e4e4ef;
+  --text-secondary: #9898b0;
+  --text-muted: #5e5e7a;
+  --text-ghost: #4a4a6a;
+
+  --accent-purple: #a78bfa;
+  --accent-green: #6ee7b7;
+  --accent-blue: #7dd3fc;
+
+  --gradient-main: linear-gradient(135deg, var(--accent-purple), var(--accent-green));
+
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-light: rgba(255, 255, 255, 0.1);
+
+  /* Typography */
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-editor: 'Inter', Georgia, 'Times New Roman', serif;
+
+  /* Sizing */
+  --toolbar-height: 48px;
+  --shortcuts-height: 36px;
+  --editor-max-width: 780px;
+  --editor-padding: 2rem;
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 400ms ease;
+}
+
+/* ---- Reset ---- */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ========================================================
+   LOADING SCREEN
+   ======================================================== */
+#loading-screen,
+#error-screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  z-index: 1000;
+}
+
+#loading-screen[hidden],
+#error-screen[hidden],
+#editor-screen[hidden] {
+  display: none !important;
+}
+
+.loading-container {
+  text-align: center;
+  max-width: 420px;
+  padding: 2rem;
+  animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.loading-icon {
+  margin-bottom: 1.5rem;
+  display: inline-block;
+}
+
+.spinner-arc {
+  transform-origin: 24px 24px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: var(--gradient-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.4rem;
+}
+
+.loading-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+}
+
+.error-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.error-container {
+  max-width: 520px;
+}
+
+.error-details {
+  text-align: left;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-top: 1.25rem;
+}
+
+.error-step-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.error-steps {
+  padding-left: 1.25rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.8;
+}
+
+.error-steps code {
+  background: var(--bg-surface);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--accent-blue);
+}
+
+.error-note {
+  margin-top: 1rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.error-note code {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  word-break: break-all;
+}
+
+/* Progress bar */
+.progress-container {
+  margin-bottom: 1.5rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--gradient-main);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-family: var(--font-ui);
+}
+
+.loading-tips {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+/* ========================================================
+   TOOLBAR
+   ======================================================== */
+.toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--toolbar-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.25rem;
+  background: rgba(15, 15, 20, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-subtle);
+  z-index: 100;
+}
+
+.toolbar-left, .toolbar-center, .toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  user-select: none;
+}
+
+.brand-icon {
+  background: var(--gradient-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 1.1rem;
+}
+
+.save-status {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  transition: color var(--transition-fast);
+}
+.save-status.unsaved {
+  color: var(--accent-purple);
+}
+
+.word-count {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.ai-status {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.ai-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  display: inline-block;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.ai-dot.generating {
+  background: var(--accent-purple);
+  animation: pulse-dot 0.6s ease-in-out infinite;
+}
+
+.ai-dot.error {
+  background: #f87171;
+  animation: none;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ========================================================
+   EDITOR
+   ======================================================== */
+.editor-wrapper {
+  position: fixed;
+  top: var(--toolbar-height);
+  bottom: var(--shortcuts-height);
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+}
+
+.editor-container {
+  position: relative;
+  width: 100%;
+  max-width: var(--editor-max-width);
+  height: 100%;
+}
+
+/* Backdrop (mirrors textarea text + ghost suggestion) */
+.editor-backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.editor-backdrop pre {
+  font-family: var(--font-editor);
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--text-primary);
+  padding: var(--editor-padding);
+  padding-top: 2.5rem;
+  padding-bottom: 4rem;
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  min-height: 100%;
+}
+
+.ghost-text {
+  color: var(--text-ghost);
+  font-style: normal;
+  pointer-events: none;
+  opacity: 0;
+  animation: ghostFadeIn 0.2s ease forwards;
+}
+
+@keyframes ghostFadeIn {
+  to { opacity: 1; }
+}
+
+/* The actual textarea (transparent text, visible caret) */
+#editor {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-editor);
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: transparent;
+  caret-color: var(--accent-purple);
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  padding: var(--editor-padding);
+  padding-top: 2.5rem;
+  padding-bottom: 4rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 2;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+#editor::placeholder {
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+#editor::-webkit-scrollbar {
+  width: 6px;
+}
+#editor::-webkit-scrollbar-track {
+  background: transparent;
+}
+#editor::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border-radius: 3px;
+}
+#editor::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+/* ========================================================
+   SHORTCUTS BAR
+   ======================================================== */
+.shortcuts-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--shortcuts-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.25rem;
+  background: rgba(15, 15, 20, 0.85);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border-subtle);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  z-index: 100;
+  user-select: none;
+}
+
+.shortcuts-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.shortcut-sep {
+  opacity: 0.3;
+}
+
+kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
+  border-radius: 3px;
+  line-height: 1.4;
+}
+
+.suggestion-indicator {
+  color: var(--accent-purple);
+  font-weight: 500;
+}
+
+/* ========================================================
+   TRANSITIONS & UTILITIES
+   ======================================================== */
+#loading-screen.fade-out {
+  animation: fadeOut 0.4s ease forwards;
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; pointer-events: none; }
+}
+
+/* ========================================================
+   RESPONSIVE
+   ======================================================== */
+@media (max-width: 640px) {
+  :root {
+    --editor-padding: 1.25rem;
+    --editor-max-width: 100%;
+  }
+
+  .toolbar {
+    padding: 0 0.75rem;
+  }
+
+  .shortcuts-bar {
+    padding: 0 0.75rem;
+    font-size: 0.65rem;
+  }
+
+  .loading-container {
+    padding: 1.5rem;
+  }
+}

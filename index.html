@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="LLM Writer — A distraction-free text editor with AI-powered autocomplete running locally in your browser via WebGPU.">
+  <title>LLM Writer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  
+  <!-- Required for WebLLM to use SharedArrayBuffer -->
+  <script src="coi-serviceworker.js"></script>
+</head>
+<body>
+  <!-- ===================== LOADING SCREEN ===================== -->
+  <div id="loading-screen">
+    <div class="loading-container">
+      <div class="loading-icon">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <circle cx="24" cy="24" r="20" stroke="url(#grad)" stroke-width="3" fill="none" opacity="0.2"/>
+          <path d="M12 24c0-6.627 5.373-12 12-12" stroke="url(#grad)" stroke-width="3" stroke-linecap="round" class="spinner-arc"/>
+          <defs>
+            <linearGradient id="grad" x1="0" y1="0" x2="48" y2="48">
+              <stop offset="0%" stop-color="#a78bfa"/>
+              <stop offset="100%" stop-color="#6ee7b7"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <h1 class="loading-title">LLM Writer</h1>
+      <p class="loading-subtitle">Preparing your AI writing assistant</p>
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <p class="progress-text" id="progress-text">Checking WebGPU support...</p>
+      </div>
+      <div class="loading-tips">
+        <p>💡 The AI model runs entirely in your browser — no data leaves your device.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== ERROR SCREEN ===================== -->
+  <div id="error-screen" hidden>
+    <div class="loading-container error-container">
+      <div class="error-icon">⚠️</div>
+      <h1 class="loading-title">WebGPU Not Available</h1>
+      <p class="loading-subtitle" id="error-message">
+        LLM Writer requires WebGPU to run AI models locally.
+      </p>
+      <div class="error-details" id="error-details">
+        <p class="error-step-title">How to enable WebGPU:</p>
+        <ol class="error-steps">
+          <li>Open Chrome and go to <code>chrome://flags/#enable-unsafe-webgpu</code></li>
+          <li>Set <strong>"Unsafe WebGPU Support"</strong> to <strong>Enabled</strong></li>
+          <li>Also try <code>chrome://flags/#enable-webgpu-developer-features</code></li>
+          <li>Click <strong>Relaunch</strong> at the bottom</li>
+          <li>Return to this page</li>
+        </ol>
+        <p class="error-note">Debug info: <code id="debug-info">checking...</code></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== EDITOR SCREEN ===================== -->
+  <div id="editor-screen" hidden>
+    <!-- Top toolbar -->
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <span class="brand">
+          <span class="brand-icon">✦</span> LLM Writer
+        </span>
+      </div>
+      <div class="toolbar-center">
+        <span class="save-status" id="save-status">Saved</span>
+      </div>
+      <div class="toolbar-right">
+        <span class="word-count" id="word-count">0 words</span>
+        <span class="ai-status" id="ai-status">
+          <span class="ai-dot"></span> AI Ready
+        </span>
+      </div>
+    </div>
+
+    <!-- Editor area -->
+    <div class="editor-wrapper">
+      <div class="editor-container" id="editor-container">
+        <div class="editor-backdrop" id="editor-backdrop" aria-hidden="true"><pre id="backdrop-pre"></pre></div>
+        <textarea
+          id="editor"
+          spellcheck="true"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          placeholder="Start writing... AI suggestions will appear as you type."
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Bottom shortcuts bar -->
+    <div class="shortcuts-bar">
+      <div class="shortcuts-left">
+        <kbd>Tab</kbd> Accept
+        <span class="shortcut-sep">·</span>
+        <kbd>Esc</kbd> Dismiss
+        <span class="shortcut-sep">·</span>
+        <kbd>Alt ↓</kbd> Next
+        <span class="shortcut-sep">·</span>
+        <kbd>Alt ↑</kbd> Prev
+      </div>
+      <div class="shortcuts-right">
+        <span class="suggestion-indicator" id="suggestion-indicator" hidden>
+          Suggestion <span id="suggestion-index">1</span>/<span id="suggestion-total">3</span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
