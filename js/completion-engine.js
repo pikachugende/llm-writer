@@ -149,7 +149,15 @@ export class CompletionEngine {
         // onFirst callback — show immediately
         (firstResult) => {
           if (genId !== this._generationId) return; // stale
+          console.debug("Completion first result (raw)", {
+            type,
+            raw: firstResult,
+          });
           const cleaned = this._cleanSuggestion(firstResult, fullText, type);
+          console.debug("Completion first result (cleaned)", {
+            type,
+            cleaned,
+          });
           if (cleaned) {
             this.suggestions = [cleaned];
             this.currentIndex = 0;
@@ -237,13 +245,15 @@ export class CompletionEngine {
       // If the model repeated the partial word, strip it
       const partialWord = this._getPartialWord(fullText);
       if (cleaned.toLowerCase().startsWith(partialWord.toLowerCase())) {
-        cleaned = cleaned.slice(partialWord.length);
+        const stripped = cleaned.slice(partialWord.length);
+        cleaned = stripped.length > 0 ? stripped : cleaned;
       }
     } else {
       // Multi-word: ensure it doesn't repeat the ending of the text
       const lastWords = fullText.trimEnd().split(/\s+/).slice(-3).join(" ");
       if (cleaned.startsWith(lastWords)) {
-        cleaned = cleaned.slice(lastWords.length).trimStart();
+        const stripped = cleaned.slice(lastWords.length).trimStart();
+        cleaned = stripped.length > 0 ? stripped : cleaned;
       }
     }
 
