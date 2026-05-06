@@ -139,9 +139,7 @@ export class CompletionEngine {
       type === "word" ? CONFIG.wordMaxTokens : CONFIG.multiWordMaxTokens;
 
     // Stop sequences
-    const stop = type === "word"
-      ? [" ", "\n", ".", ",", "!", "?", ";", ":"]
-      : undefined;
+    const stop = undefined;
 
     try {
       const variants = await this.llm.generateVariants(

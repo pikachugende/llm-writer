@@ -21,7 +21,7 @@ export const CONFIG = {
   temperatures: [0.25, 0.6, 1.0],
 
   // Max tokens for word completion (just finish the word)
-  wordMaxTokens: 12,
+  wordMaxTokens: 24,
   // Max tokens for multi-word completion (contextual)
   multiWordMaxTokens: 40,
 
