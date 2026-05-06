@@ -148,32 +148,31 @@ export class LLMEngine {
       stop = [],
     } = opts;
 
-    const results = [];
+    const results = new Array(count).fill("");
+    let firstDelivered = false;
 
-    for (let i = 0; i < count; i++) {
+    const tasks = Array.from({ length: count }, (_, i) => {
       const temp = CONFIG.temperatures[i] ?? 0.5;
-
-      try {
-        const text = await this.generate(systemPrompt, userPrompt, {
-          maxTokens,
-          temperature: temp,
-          stop,
+      return this.generate(systemPrompt, userPrompt, {
+        maxTokens,
+        temperature: temp,
+        stop,
+      })
+        .then((text) => {
+          results[i] = text;
+          if (!firstDelivered && onFirst) {
+            firstDelivered = true;
+            onFirst(text);
+          }
+        })
+        .catch((err) => {
+          if (err?.message?.includes("interrupt")) return;
+          console.warn(`Variant ${i} failed:`, err);
+          results[i] = "";
         });
+    });
 
-        results.push(text);
-
-        // Deliver the first result immediately
-        if (i === 0 && onFirst) {
-          onFirst(text);
-        }
-      } catch (err) {
-        // If generation was cancelled, stop
-        if (err?.message?.includes("interrupt")) break;
-        console.warn(`Variant ${i} failed:`, err);
-        results.push("");
-      }
-    }
-
+    await Promise.allSettled(tasks);
     return results;
   }
 }
